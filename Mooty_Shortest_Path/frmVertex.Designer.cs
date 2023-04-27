@@ -1,6 +1,6 @@
 ﻿namespace Mooty_Shortest_Path
 {
-    partial class frmAddVertex
+    partial class frmVertex
     {
         /// <summary>
         /// Required designer variable.
@@ -41,7 +41,9 @@
             this.btnAddEdge = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnEditEdge = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
             this.SuspendLayout();
             // 
             // label1
@@ -68,7 +70,7 @@
             this.txtLabel.Location = new System.Drawing.Point(120, 17);
             this.txtLabel.Name = "txtLabel";
             this.txtLabel.Size = new System.Drawing.Size(125, 27);
-            this.txtLabel.TabIndex = 2;
+            this.txtLabel.TabIndex = 1;
             // 
             // txtX
             // 
@@ -77,7 +79,7 @@
             this.txtX.Location = new System.Drawing.Point(120, 54);
             this.txtX.Name = "txtX";
             this.txtX.Size = new System.Drawing.Size(39, 27);
-            this.txtX.TabIndex = 3;
+            this.txtX.TabIndex = 2;
             // 
             // txtY
             // 
@@ -86,7 +88,7 @@
             this.txtY.Location = new System.Drawing.Point(206, 54);
             this.txtY.Name = "txtY";
             this.txtY.Size = new System.Drawing.Size(39, 27);
-            this.txtY.TabIndex = 5;
+            this.txtY.TabIndex = 3;
             // 
             // label3
             // 
@@ -102,7 +104,9 @@
             this.lvwEdges.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lvwEdges.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
-            this.columnHeader2});
+            this.columnHeader2,
+            this.columnHeader3});
+            this.lvwEdges.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lvwEdges.FullRowSelect = true;
             this.lvwEdges.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvwEdges.LabelEdit = true;
@@ -116,12 +120,13 @@
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "To";
-            this.columnHeader1.Width = 75;
+            this.columnHeader1.Text = "From";
+            this.columnHeader1.Width = 45;
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "Weight";
+            this.columnHeader2.Text = "To";
+            this.columnHeader2.Width = 45;
             // 
             // label4
             // 
@@ -137,46 +142,64 @@
             this.btnAddEdge.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnAddEdge.Location = new System.Drawing.Point(21, 121);
             this.btnAddEdge.Name = "btnAddEdge";
-            this.btnAddEdge.Size = new System.Drawing.Size(45, 29);
-            this.btnAddEdge.TabIndex = 8;
+            this.btnAddEdge.Size = new System.Drawing.Size(44, 28);
+            this.btnAddEdge.TabIndex = 4;
             this.btnAddEdge.Text = "Add";
             this.btnAddEdge.UseVisualStyleBackColor = true;
+            this.btnAddEdge.Click += new System.EventHandler(this.btnAddEdge_Click);
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(175, 243);
+            this.btnApply.Location = new System.Drawing.Point(25, 244);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(70, 29);
-            this.btnApply.TabIndex = 9;
+            this.btnApply.Size = new System.Drawing.Size(70, 32);
+            this.btnApply.TabIndex = 7;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(99, 243);
+            this.btnCancel.Location = new System.Drawing.Point(177, 244);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(70, 29);
-            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Size = new System.Drawing.Size(70, 32);
+            this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // button1
+            // btnEditEdge
             // 
-            this.button1.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button1.Location = new System.Drawing.Point(21, 156);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(45, 29);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "Edit";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnEditEdge.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnEditEdge.Location = new System.Drawing.Point(21, 156);
+            this.btnEditEdge.Name = "btnEditEdge";
+            this.btnEditEdge.Size = new System.Drawing.Size(44, 28);
+            this.btnEditEdge.TabIndex = 5;
+            this.btnEditEdge.Text = "Edit";
+            this.btnEditEdge.UseVisualStyleBackColor = true;
+            this.btnEditEdge.Click += new System.EventHandler(this.btnEditEdge_Click);
             // 
-            // frmAddVertex
+            // btnDelete
+            // 
+            this.btnDelete.Location = new System.Drawing.Point(101, 244);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(70, 32);
+            this.btnDelete.TabIndex = 8;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Weight";
+            // 
+            // frmVertex
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(268, 288);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnDelete);
+            this.Controls.Add(this.btnEditEdge);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnAddEdge);
@@ -188,7 +211,7 @@
             this.Controls.Add(this.txtLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Name = "frmAddVertex";
+            this.Name = "frmVertex";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Vertex";
             this.ResumeLayout(false);
@@ -211,6 +234,8 @@
         private Button btnCancel;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
-        private Button button1;
+        private Button btnEditEdge;
+        private Button btnDelete;
+        private ColumnHeader columnHeader3;
     }
 }

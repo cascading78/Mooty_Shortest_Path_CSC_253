@@ -50,12 +50,13 @@
             this.graphCanvas.TabIndex = 0;
             this.graphCanvas.VertexBackColor = System.Drawing.Color.OrangeRed;
             this.graphCanvas.VertexForeColor = System.Drawing.Color.White;
-            this.graphCanvas.VertexHighlightColor = System.Drawing.Color.DeepSkyBlue;
-            this.graphCanvas.OnMouseOverVertex += new System.EventHandler<Mooty_Shortest_Path.DirectedVertex>(this.graphCanvas1_OnMouseOverVertex);
-            this.graphCanvas.OnMouseOverEdge += new System.EventHandler<Mooty_Shortest_Path.DirectedEdge>(this.graphCanvas_OnMouseOverEdge);
+            this.graphCanvas.VertexHighlightColor = System.Drawing.Color.DodgerBlue;
             this.graphCanvas.OnVertexMouseClick += new System.EventHandler<Mooty_Shortest_Path.DirectedVertex>(this.graphCanvas_OnVertexMouseClick);
             this.graphCanvas.OnEdgeMouseClick += new System.EventHandler<Mooty_Shortest_Path.DirectedEdge>(this.graphCanvas_OnEdgeMouseClick);
             this.graphCanvas.OnVertexDoubleClick += new System.EventHandler<Mooty_Shortest_Path.DirectedVertex>(this.graphCanvas_OnVertexDoubleClick);
+            this.graphCanvas.OnEdgeDoubleClick += new System.EventHandler<Mooty_Shortest_Path.DirectedEdge>(this.graphCanvas_OnEdgeDoubleClick);
+            this.graphCanvas.OnGridDoubleClick += new System.EventHandler<Point>(this.graphCanvas_OnGridDoubleClick);
+            this.graphCanvas.Load += new System.EventHandler(this.graphCanvas_Load);
             this.graphCanvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.graphCanvas1_MouseMove);
             // 
             // lblDebug

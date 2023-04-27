@@ -36,6 +36,9 @@ namespace Mooty_Shortest_Path
         {
             _edges.Remove(edge);
         }
+
+        //public void updateEdge()
+
     }
     
     public class Edge
@@ -47,7 +50,7 @@ namespace Mooty_Shortest_Path
     {
         public DirectedVertex To { get; }
         public DirectedVertex From { get; }
-        public double Weight { get; }
+        public double Weight { get; set;  }
 
 
         public DirectedEdge(DirectedVertex from, DirectedVertex to, double weight)

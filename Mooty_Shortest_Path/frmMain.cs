@@ -33,11 +33,12 @@ namespace Mooty_Shortest_Path
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            graphCanvas.AddVertex(125, 50, "V1");
-            graphCanvas.AddVertex(75, 225, "V2");
-            graphCanvas.AddVertex(305, 195, "V3");
-            graphCanvas.AddVertex(298, 419, "V4");
-            graphCanvas.AddVertex(450, 169, "V5");
+            // test graph
+            graphCanvas.AddVertex(125, 50, "NYC");
+            graphCanvas.AddVertex(75, 225, "CHI");
+            graphCanvas.AddVertex(305, 195, "ATL");
+            graphCanvas.AddVertex(298, 419, "SEA");
+            graphCanvas.AddVertex(450, 169, "MIA");
             graphCanvas.AddEdge(0, 1, 12.98);
             graphCanvas.AddEdge(1, 2, 10.66);
             graphCanvas.AddEdge(0, 2, 6.39);
@@ -72,18 +73,56 @@ namespace Mooty_Shortest_Path
 
         private void button2_Click(object sender, EventArgs e)
         {
-            frmAddVertex frmAddVertex = new frmAddVertex();
-            frmAddVertex.LoadVertex(selectedVertex);
+            frmVertex frmAddVertex = new frmVertex();
             frmAddVertex.Show();
+
             //frmAddVertex.ShowDialog();
         }
 
-        private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex e)
+        private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex v)
         {
-            frmAddVertex frmVertex = new frmAddVertex();
-            frmVertex.LoadVertex(selectedVertex, true);
-            frmVertex.Location = new Point(e.X, e.Y);
+            selectedVertex = v;
+
+            frmVertex frmVertex = new frmVertex();
+            frmVertex.InitializeEditState(graphCanvas, v);
+            frmVertex.Location = new Point(v.X, v.Y);
             frmVertex.Show();
+        }
+
+        private void graphCanvas_OnEdgeDoubleClick(object sender, DirectedEdge e)
+        {
+
+            frmEdge frmEdgeEdit = new frmEdge();
+            frmEdgeEdit.InitializeEditEdgeState(graphCanvas, e);
+            frmEdgeEdit.Location = new Point((e.From.X + e.To.X) / 2, (e.From.Y + e.To.Y) / 2);
+            frmEdgeEdit.ShowDialog();
+
+            if (frmEdgeEdit.DeletePressed)
+                graphCanvas.RemoveEdge(e);
+            else if (!(frmEdgeEdit.CancelPressed))
+                graphCanvas.UpdateEdge(e, frmEdgeEdit.DirectedEdge.Weight);
+ 
+        }
+
+        private void graphCanvas_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void graphCanvas_OnGridDoubleClick(object sender, Point pt)
+        {
+            DirectedVertex new_vertex = new DirectedVertex(pt.X, pt.Y, "");
+
+            frmVertex frmAddVertex = new frmVertex();
+            frmAddVertex.Location = pt;
+            frmAddVertex.InitializeAddNewState(graphCanvas, pt.X, pt.Y);
+            frmAddVertex.ShowDialog();
+
+            if (frmAddVertex.Vertex != null)
+            {
+                graphCanvas.AddVertex(frmAddVertex.Vertex);
+                graphCanvas.Invalidate();
+            }
         }
     }
 }

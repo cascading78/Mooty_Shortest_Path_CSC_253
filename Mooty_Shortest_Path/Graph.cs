@@ -16,6 +16,11 @@ namespace Mooty_Shortest_Path
             _vertices.Add(new DirectedVertex(x, y, label));
         }
 
+        public void addVertex(DirectedVertex v)
+        {
+            _vertices.Add(v);
+        }
+
         public void removeVertex(DirectedVertex v)
         {
             Dictionary<DirectedVertex, DirectedEdge> delete_list = new Dictionary<DirectedVertex, DirectedEdge>();
@@ -54,6 +59,16 @@ namespace Mooty_Shortest_Path
 
             return -1;
                     
+        }
+
+        public DirectedVertex? GetVertex(string label)
+        {
+            for (int i = 0; i < _vertices.Count; i++)
+                if (_vertices[i].Label == label)
+                    return _vertices[i];
+
+            return null;
+
         }
 
     }

@@ -36,6 +36,7 @@
             this.txtWeight = new System.Windows.Forms.TextBox();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -93,27 +94,40 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(93, 129);
+            this.btnCancel.Location = new System.Drawing.Point(171, 129);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(70, 29);
             this.btnCancel.TabIndex = 12;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(169, 129);
+            this.btnApply.Location = new System.Drawing.Point(19, 129);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(70, 29);
             this.btnApply.TabIndex = 11;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.Location = new System.Drawing.Point(95, 129);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(70, 29);
+            this.btnDelete.TabIndex = 13;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // frmEdge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(256, 170);
+            this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.txtWeight);
@@ -143,5 +157,6 @@
         private TextBox txtWeight;
         private Button btnCancel;
         private Button btnApply;
+        private Button btnDelete;
     }
 }

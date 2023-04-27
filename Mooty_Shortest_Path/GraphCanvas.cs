@@ -20,11 +20,13 @@ public partial class GraphCanvas : UserControl
         EDIT_MODE
     }
 
-    public event EventHandler<DirectedVertex> OnMouseOverVertex;
-    public event EventHandler<DirectedEdge> OnMouseOverEdge;
+    //public event EventHandler<DirectedVertex> OnMouseOverVertex;
+    //public event EventHandler<DirectedEdge> OnMouseOverEdge;
     public event EventHandler<DirectedVertex> OnVertexMouseClick;
     public event EventHandler<DirectedEdge> OnEdgeMouseClick;
     public event EventHandler<DirectedVertex> OnVertexDoubleClick;
+    public event EventHandler<DirectedEdge> OnEdgeDoubleClick;
+    public event EventHandler<Point> OnGridDoubleClick;
 
     List<GraphicsPath> vert_paths = new List<GraphicsPath>();
     List<GraphicsPath> edge_paths = new List<GraphicsPath>();
@@ -33,6 +35,7 @@ public partial class GraphCanvas : UserControl
     const int GRID_SIZE = 16;
     const int VERT_SIZE = 36;
     const int EDGE_SIZE = 4;
+
     const float MOUSE_OVER_ELEMENT_GROWTH = 1.4f;
     const int WEIGHT_TEXT_SIZE = 7;
     private Color EDGE_WEIGHT_COLOR = Color.FloralWhite;
@@ -45,6 +48,7 @@ public partial class GraphCanvas : UserControl
     private DirectedVertex? selectedVert = null;
     private DirectedEdge? selectedEdge = null;
     private object? prevMouseOver = null; // reference to edge/vert mouse was previously over, if any
+    private Point currentMousePoint;
 
     private Color _edgeColor = Color.Black;
     public Color EdgeColor { get { return _edgeColor; } set { _edgeColor = value; } }
@@ -169,6 +173,9 @@ public partial class GraphCanvas : UserControl
 
     private void GraphCanvas_MouseMove(object sender, MouseEventArgs e)
     {
+
+        currentMousePoint = new Point(e.X, e.Y);
+
         mouseOverVert = GetVertexAt(e.X, e.Y);
 
         if(mouseOverVert == null) // ensure mouse only over one object at time
@@ -179,7 +186,7 @@ public partial class GraphCanvas : UserControl
             prevMouseOver = mouseOverVert;
             mouseOverEdge = null; // ensure mouse only over one object at time
             hasGraphChanged = true;
-            OnMouseOverVertex?.Invoke(this, mouseOverVert);
+            //OnMouseOverVertex?.Invoke(this, mouseOverVert);
 
             if(e.Button == MouseButtons.Left)
                 moveVertex(mouseOverVert, e.X, e.Y);
@@ -190,7 +197,7 @@ public partial class GraphCanvas : UserControl
         {
             prevMouseOver = mouseOverEdge;
             hasGraphChanged = true;
-            OnMouseOverEdge?.Invoke(this, mouseOverEdge);
+            //OnMouseOverEdge?.Invoke(this, mouseOverEdge);
             this.Invalidate();
             
         } 
@@ -239,7 +246,9 @@ public partial class GraphCanvas : UserControl
 
     }
 
-    public void updateEdgePaths()
+
+
+    private void updateEdgePaths()
     {
         edge_paths.Clear();
 
@@ -254,7 +263,7 @@ public partial class GraphCanvas : UserControl
         }
     }
 
-    public void updateEdgePath(DirectedEdge e)
+    private void updateEdgePath(DirectedEdge e) // not used?
     {
         int found_index = -1;
 
@@ -298,6 +307,20 @@ public partial class GraphCanvas : UserControl
         gpath.AddRectangle(rectText);
         vert_paths.Add(gpath);
         hasGraphChanged = true;
+    }
+
+    public void AddVertex(DirectedVertex v)
+    {
+        _graph.addVertex(v);
+
+        GraphicsPath gpath = new GraphicsPath();
+        Rectangle rectText = GetTextRect(v.Label, v.X, v.Y, this.Font);
+        gpath.AddRectangle(rectText);
+        vert_paths.Add(gpath);
+        hasGraphChanged = true;
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
     }
 
     public void RemoveVertex(DirectedVertex v)
@@ -345,6 +368,34 @@ public partial class GraphCanvas : UserControl
         }
     }
 
+    public void UpdateEdge(DirectedEdge edge, double weight)
+    {
+        edge.Weight = weight;
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
+
+        hasGraphChanged = true;
+
+        this.Invalidate();
+    }
+
+    public void RemoveEdge(DirectedEdge edge)
+    {
+        // this confusing line of code hopefully deletes the edge that was loaded
+        //  during InitializeEditEdgeState, the From edge (probably should have
+        //  named it Parent considering this is a directed graph) should always be
+        //  where the edge is stored
+        edge.From.removeEdge(edge);
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
+
+        hasGraphChanged = true;
+
+        this.Invalidate();
+    }
+
     private void GraphCanvas_MouseDown(object sender, MouseEventArgs e)
     {
         if (mouseOverVert != null && e.Button == MouseButtons.Left) // move to mouse_click?
@@ -363,7 +414,12 @@ public partial class GraphCanvas : UserControl
 
     private void GraphCanvas_DoubleClick(object sender, EventArgs e)
     {
-        if(mouseOverVert != null)
+        if (mouseOverVert != null)
             OnVertexDoubleClick?.Invoke(this, mouseOverVert);
+        else if (mouseOverEdge != null)
+            OnEdgeDoubleClick?.Invoke(this, mouseOverEdge);
+        else
+            OnGridDoubleClick?.Invoke(this, currentMousePoint);
     }
+
 }
