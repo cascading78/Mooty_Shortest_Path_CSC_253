@@ -37,13 +37,14 @@
             this.lvwEdges = new System.Windows.Forms.ListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
             this.label4 = new System.Windows.Forms.Label();
             this.btnAddEdge = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnEditEdge = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.btnRemoveEdge = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -109,7 +110,6 @@
             this.lvwEdges.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lvwEdges.FullRowSelect = true;
             this.lvwEdges.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.lvwEdges.LabelEdit = true;
             this.lvwEdges.Location = new System.Drawing.Point(96, 98);
             this.lvwEdges.MultiSelect = false;
             this.lvwEdges.Name = "lvwEdges";
@@ -117,6 +117,7 @@
             this.lvwEdges.TabIndex = 6;
             this.lvwEdges.UseCompatibleStateImageBehavior = false;
             this.lvwEdges.View = System.Windows.Forms.View.Details;
+            this.lvwEdges.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lvwEdges_MouseDoubleClick);
             // 
             // columnHeader1
             // 
@@ -127,6 +128,10 @@
             // 
             this.columnHeader2.Text = "To";
             this.columnHeader2.Width = 45;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Weight";
             // 
             // label4
             // 
@@ -189,15 +194,24 @@
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
-            // columnHeader3
+            // btnRemoveEdge
             // 
-            this.columnHeader3.Text = "Weight";
+            this.btnRemoveEdge.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnRemoveEdge.Location = new System.Drawing.Point(21, 190);
+            this.btnRemoveEdge.Name = "btnRemoveEdge";
+            this.btnRemoveEdge.Size = new System.Drawing.Size(44, 28);
+            this.btnRemoveEdge.TabIndex = 10;
+            this.btnRemoveEdge.Text = "Rem";
+            this.btnRemoveEdge.UseVisualStyleBackColor = true;
+            this.btnRemoveEdge.Click += new System.EventHandler(this.btnRemoveEdge_Click);
             // 
             // frmVertex
             // 
+            this.AcceptButton = this.btnApply;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(268, 288);
+            this.Controls.Add(this.btnRemoveEdge);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnEditEdge);
             this.Controls.Add(this.btnCancel);
@@ -237,5 +251,6 @@
         private Button btnEditEdge;
         private Button btnDelete;
         private ColumnHeader columnHeader3;
+        private Button btnRemoveEdge;
     }
 }

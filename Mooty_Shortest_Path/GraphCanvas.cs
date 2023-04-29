@@ -71,6 +71,17 @@ public partial class GraphCanvas : UserControl
         InitializeComponent();
     }
 
+    public void TestLoopEvent()
+    {
+        _graph.LoopThroughVerts();
+    }
+
+    // test event
+    private void SearchingVertex(object sender, DirectedVertex v)
+    {
+        MessageBox.Show($"VERT:{v.Label}");
+    }
+
     private void GraphCanvas_Paint(object sender, PaintEventArgs e)
     {
 
@@ -123,16 +134,41 @@ public partial class GraphCanvas : UserControl
             int c_x = (edge.To.X + edge.From.X) / 2;
             int c_y = (edge.To.Y + edge.From.Y) / 2;
 
-            Rectangle rectText = GetTextRect(edge.Weight.ToString(), c_x, c_y, font);
+            string weight_label = $"{edge.Weight} {getDirectionSymbol(edge.From.X, edge.From.Y, edge.To.X, edge.To.Y)}";
+            Rectangle rectText = GetTextRect(weight_label, c_x, c_y, font);
 
             g.DrawRectangle(new Pen(Color.Black), rectText);
             g.FillRectangle(new SolidBrush(EDGE_WEIGHT_COLOR), rectText);
-            g.DrawString(edge.Weight.ToString(), font, new SolidBrush(this.ForeColor), rectText.X, rectText.Y);
+            g.DrawString(weight_label, font, new SolidBrush(this.ForeColor), rectText.X, rectText.Y);
         }
 
         pen.Dispose();
         pen_highlight.Dispose();
         font.Dispose();
+    }
+
+    private string getDirectionSymbol(int s_x, int s_y, int e_x, int e_y)
+    {
+        int line_angle = (int)angle(s_x, s_y, e_x, e_y);
+
+        if (line_angle >= 45 && line_angle <= 135)
+            return "v";
+        else if (line_angle > 135 && line_angle <= 225)
+            return "<";
+        else if (line_angle > 225 && line_angle <= 315)
+            return "^";
+        else
+            return ">";
+    }
+
+    private double angle(int cx, int cy, int ex, int ey)
+    {
+        int dy = ey - cy;
+        int dx = ex - cx;
+        double theta = Math.Atan2(dy, dx); // range (-PI, PI]
+        theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+        if (theta < 0) theta = 360 + theta; // range [0, 360)
+        return theta;
     }
 
     private void DrawVertices(Bitmap bmp, Graphics g)
@@ -144,7 +180,7 @@ public partial class GraphCanvas : UserControl
         foreach (DirectedVertex vertex in _graph.Vertices)
         {
             Rectangle rectText = GetTextRect(vertex.Label, vertex.X, vertex.Y, this.Font);
-            SolidBrush brsh = vertex.Equals(mouseOverVert) ? brush_highlight_vert : brush_vert;
+            SolidBrush brsh = vertex.Equals(mouseOverVert) || vertex.Equals(selectedVert) ? brush_highlight_vert : brush_vert;
 
             g.DrawRectangle(new Pen(Color.Black, 2), rectText.X, rectText.Y, rectText.Width, rectText.Height);
             g.FillRectangle(brsh, rectText.X, rectText.Y, rectText.Width, rectText.Height);
@@ -168,6 +204,7 @@ public partial class GraphCanvas : UserControl
     private void GraphCanvas_Load(object sender, EventArgs e)
     {
         this.DoubleBuffered = true;
+        _graph.SearchingVertex += SearchingVertex;
         //ShowGrid = true;
     }
 
@@ -178,7 +215,10 @@ public partial class GraphCanvas : UserControl
 
         mouseOverVert = GetVertexAt(e.X, e.Y);
 
-        if(mouseOverVert == null) // ensure mouse only over one object at time
+        if (selectedVert != null && e.Button == MouseButtons.Left)
+            moveVertex(selectedVert, e.X, e.Y);
+
+        if (mouseOverVert == null) // ensure mouse only over one object at time
             mouseOverEdge = GetEdgeAt(e.X, e.Y);
 
         if (mouseOverVert != null)
@@ -188,8 +228,8 @@ public partial class GraphCanvas : UserControl
             hasGraphChanged = true;
             //OnMouseOverVertex?.Invoke(this, mouseOverVert);
 
-            if(e.Button == MouseButtons.Left)
-                moveVertex(mouseOverVert, e.X, e.Y);
+            //if(e.Button == MouseButtons.Left)
+                //moveVertex(mouseOverVert, e.X, e.Y);
 
             this.Invalidate();
         }
@@ -212,6 +252,10 @@ public partial class GraphCanvas : UserControl
 
     }
 
+    public DirectedVertex? GetVertex(string label)
+    {
+        return _graph.GetVertex(label);
+    }
 
     public DirectedVertex? GetVertexAt(int x, int y)
     {
@@ -246,7 +290,15 @@ public partial class GraphCanvas : UserControl
 
     }
 
+    private void rebuildEdgeAdjacency()
+    {
+        adj_edges.Clear();
 
+        foreach (DirectedVertex vertex in _graph.Vertices)
+            foreach (DirectedEdge edge in vertex.Edges)
+                adj_edges.Add(edge);
+
+    }
 
     private void updateEdgePaths()
     {
@@ -307,6 +359,9 @@ public partial class GraphCanvas : UserControl
         gpath.AddRectangle(rectText);
         vert_paths.Add(gpath);
         hasGraphChanged = true;
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
     }
 
     public void AddVertex(DirectedVertex v)
@@ -337,16 +392,6 @@ public partial class GraphCanvas : UserControl
         this.Invalidate();
     }
 
-    private void rebuildEdgeAdjacency()
-    {
-        adj_edges.Clear();
-
-        foreach(DirectedVertex vertex in _graph.Vertices)
-            foreach(DirectedEdge edge in vertex.Edges)
-                adj_edges.Add(edge);
-
-    }
-
     public void AddEdge(int from, int to, double weight)
     {
         if ((from >= 0 && from < _graph.Vertices.Count) &&
@@ -358,11 +403,12 @@ public partial class GraphCanvas : UserControl
 
             DirectedEdge edge = new DirectedEdge(vFrom, vTo, weight);
             vFrom.addEdge(edge);
-            adj_edges.Add(edge); // keep reference to all edges for mouse events
 
             GraphicsPath gp = new GraphicsPath();
             gp.AddLine(vFrom.X, vFrom.Y, vTo.X, vTo.Y);
-            edge_paths.Add(gp);
+
+            rebuildEdgeAdjacency();
+            updateEdgePaths();
 
             hasGraphChanged = true;
         }
@@ -370,7 +416,7 @@ public partial class GraphCanvas : UserControl
 
     public void UpdateEdge(DirectedEdge edge, double weight)
     {
-        edge.Weight = weight;
+        edge.From.updateEdge(edge.From.Label, edge.To.Label, weight);
 
         rebuildEdgeAdjacency();
         updateEdgePaths();
@@ -378,6 +424,24 @@ public partial class GraphCanvas : UserControl
         hasGraphChanged = true;
 
         this.Invalidate();
+    }
+
+    public void UpdateVertex(string original_label, string new_label, int x, int y, List<DirectedEdge> edge_list)
+    {
+        DirectedVertex update_vertex = _graph.GetVertex(original_label);
+
+        if (update_vertex == null) return;
+
+        update_vertex.Label = new_label;
+        update_vertex.X = x;
+        update_vertex.Y = y;
+        update_vertex.ReplaceEdges(edge_list);
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
+        hasGraphChanged = true;
+        this.Invalidate();
+        
     }
 
     public void RemoveEdge(DirectedEdge edge)
@@ -398,8 +462,11 @@ public partial class GraphCanvas : UserControl
 
     private void GraphCanvas_MouseDown(object sender, MouseEventArgs e)
     {
-        if (mouseOverVert != null && e.Button == MouseButtons.Left) // move to mouse_click?
+        if (mouseOverVert != null && e.Button == MouseButtons.Left)
+        {
+            selectedVert = mouseOverVert;
             OnVertexMouseClick?.Invoke(this, mouseOverVert);
+        }
 
         if (mouseOverEdge != null && e.Button == MouseButtons.Left)
             OnEdgeMouseClick?.Invoke(this, mouseOverEdge);
@@ -408,6 +475,8 @@ public partial class GraphCanvas : UserControl
 
     private void GraphCanvas_MouseUp(object sender, MouseEventArgs e)
     {
+        selectedVert = null;
+
         if ((mouseOverVert != null || prevMouseOver != null) && e.Button == MouseButtons.Left)
             updateEdgePaths();
     }
@@ -421,5 +490,7 @@ public partial class GraphCanvas : UserControl
         else
             OnGridDoubleClick?.Invoke(this, currentMousePoint);
     }
+
+    
 
 }

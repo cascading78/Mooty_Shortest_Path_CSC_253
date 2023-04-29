@@ -37,6 +37,44 @@ namespace Mooty_Shortest_Path
             _edges.Remove(edge);
         }
 
+        public DirectedEdge? GetEdge(string from_label, string to_label)
+        {
+            foreach (DirectedEdge edge in _edges)
+                if (edge.From.Label == from_label && edge.To.Label == to_label)
+                    return edge;
+
+            return null;
+        }
+
+        public DirectedEdge? GetEdge(DirectedVertex vFrom, DirectedVertex vTo)
+        {
+            foreach (DirectedEdge edge in Edges)
+                if (edge.From.Equals(vFrom) && edge.To.Equals(vTo))
+                    return edge;
+
+            return null;
+        }
+
+        public void AddEdges(List<DirectedEdge> edge_list)
+        {
+            foreach (DirectedEdge edge in edge_list)
+                _edges.Add(edge);
+        }
+
+        public void ReplaceEdges(List<DirectedEdge> edge_list)
+        {
+            _edges.Clear();
+            AddEdges(edge_list);
+        }
+
+        public void updateEdge(string from_label, string to_label, double weight)
+        {
+            DirectedEdge edge = GetEdge(from_label, to_label);
+
+            if(edge != null)
+                edge.Weight = weight;
+        }
+
         //public void updateEdge()
 
     }

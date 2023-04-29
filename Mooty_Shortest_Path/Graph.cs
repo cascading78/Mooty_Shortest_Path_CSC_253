@@ -8,8 +8,10 @@ namespace Mooty_Shortest_Path
 {
     public class Graph
     {
+        public event EventHandler<DirectedVertex> SearchingVertex; //test
+
         List<DirectedVertex> _vertices = new List<DirectedVertex>();
-        public IList<DirectedVertex> Vertices { get { return _vertices.AsReadOnly();  } }
+        public IList<DirectedVertex> Vertices { get { return _vertices.AsReadOnly(); } }
 
         public void addVertex(int x, int y, string label)
         {
@@ -45,8 +47,14 @@ namespace Mooty_Shortest_Path
             // remove vertex
             _vertices.RemoveAt(found_index);
 
-            
 
+
+        }
+
+        public void LoopThroughVerts()
+        {
+            foreach (DirectedVertex v in _vertices)
+                SearchingVertex?.Invoke(this, v);
         }
 
         // searches for vertex in vertex list and returns index of vertex if found, -1
@@ -58,7 +66,24 @@ namespace Mooty_Shortest_Path
                     return i;
 
             return -1;
-                    
+
+        }
+
+        public bool DoesVertexExist(string label)
+        {
+            if (GetVertex(label) == null) return false;
+
+            return true;
+        }
+
+        public bool DoesEdgeExist(string from_label, string to_label)
+        {
+            foreach (DirectedVertex vertex in _vertices)
+                foreach (DirectedEdge edge in vertex.Edges)
+                    if (edge.From.Label == from_label && edge.To.Label == to_label)
+                        return true;
+
+            return false;
         }
 
         public DirectedVertex? GetVertex(string label)
@@ -68,6 +93,19 @@ namespace Mooty_Shortest_Path
                     return _vertices[i];
 
             return null;
+
+        }
+
+        public void UpdateEdge(string from_label, string to_label, double weight)
+        {
+            GetVertex(from_label).updateEdge(from_label, to_label, weight);
+        }
+
+        public void UpdateEdges(DirectedVertex v, List<DirectedEdge> edge_list)
+        {
+            if(!DoesVertexExist(v.Label)) return;
+
+            v.ReplaceEdges(edge_list);
 
         }
 

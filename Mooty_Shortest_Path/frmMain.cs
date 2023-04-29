@@ -73,10 +73,7 @@ namespace Mooty_Shortest_Path
 
         private void button2_Click(object sender, EventArgs e)
         {
-            frmVertex frmAddVertex = new frmVertex();
-            frmAddVertex.Show();
-
-            //frmAddVertex.ShowDialog();
+            graphCanvas.TestLoopEvent();
         }
 
         private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex v)
@@ -99,7 +96,7 @@ namespace Mooty_Shortest_Path
 
             if (frmEdgeEdit.DeletePressed)
                 graphCanvas.RemoveEdge(e);
-            else if (!(frmEdgeEdit.CancelPressed))
+            else if (frmEdgeEdit.ApplyPressed)
                 graphCanvas.UpdateEdge(e, frmEdgeEdit.DirectedEdge.Weight);
  
         }
@@ -119,10 +116,8 @@ namespace Mooty_Shortest_Path
             frmAddVertex.ShowDialog();
 
             if (frmAddVertex.Vertex != null)
-            {
-                graphCanvas.AddVertex(frmAddVertex.Vertex);
                 graphCanvas.Invalidate();
-            }
+
         }
     }
 }
