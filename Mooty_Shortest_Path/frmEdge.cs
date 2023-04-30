@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using System.Windows.Forms;
-
-namespace Mooty_Shortest_Path;
+﻿namespace Mooty_Shortest_Path;
 
 public partial class frmEdge : Form
 {
 
-    private GraphCanvas parentGraphCanvas = null;
+    private GraphCanvas parentGraphCanvas; // = null;
     private DirectedVertex? parentVertex = null;
     private DirectedEdge? originalEdge = null;
 
@@ -39,7 +28,7 @@ public partial class frmEdge : Form
     {
         parentGraphCanvas = graphCanvas;
         parentVertex = vertFrom;
-        LoadComboBoxes();
+        LoadComboBox(cboTo, vertFrom);
         cboFrom.Items.Add(vertFrom.Label);
         cboFrom.SelectedItem = cboFrom.Items[cboFrom.Items.IndexOf(vertFrom.Label)];
         cboFrom.Enabled = false;
@@ -69,7 +58,8 @@ public partial class frmEdge : Form
 
     }
 
-    public void InitializeState(GraphCanvas graphCanvas, bool addToVertMode = false, DirectedVertex vertFrom = null)
+    // deFUNCt
+    /*public void InitializeState(GraphCanvas graphCanvas, bool addToVertMode = false, DirectedVertex vertFrom = null)
     {
 
         parentGraphCanvas = graphCanvas;
@@ -83,7 +73,7 @@ public partial class frmEdge : Form
             cboFrom.Enabled = false;
         }
 
-    }
+    }*/
 
     private void LoadEdge(DirectedEdge edge)
     {
@@ -149,14 +139,12 @@ public partial class frmEdge : Form
                         );
     }
 
-    private void LoadComboBoxes()
+    private void LoadComboBox(ComboBox cbo, DirectedVertex? except_this_vertex = null)
     {
         //load combo boxes
         foreach (Vertex v in parentGraphCanvas.Graph.Vertices)
-        {
-            cboFrom.Items.Add(v.Label);
-            cboTo.Items.Add(v.Label);
-        }
+            if(!v.Equals(except_this_vertex))
+                cbo.Items.Add(v.Label);
     }
 
     private bool IsDataValid()
@@ -164,22 +152,22 @@ public partial class frmEdge : Form
 
         if (!double.TryParse(txtWeight.Text, out double weight))
         {
-            MessageBox.Show("Please enter a valid weight.");
+            Program.ShowMessage("Please enter a valid weight.", "Error", this.Location);
             txtWeight.Focus();
             return false;
         }
 
         if(cboFrom.Text.Trim() == "" || cboTo.Text.Trim() == "")
         {
-            MessageBox.Show("Please select a valid from and to vertex.");
+            Program.ShowMessage("Please select a valid from and to vertex.", "Error", this.Location);
             return false;
         }
 
-        if(btnApply.Text == "Add" && (parentGraphCanvas.Graph.DoesEdgeExist(cboFrom.Text, cboTo.Text)))
+        /*if((btnApply.Text == "Add" && (parentGraphCanvas.Graph.DoesEdgeExist(cboFrom.Text, cboTo.Text))))
         {
             MessageBox.Show("That edge already exists.");
             return false;
-        }
+        }*/
 
         return true;
     }

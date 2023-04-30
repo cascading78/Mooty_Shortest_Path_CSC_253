@@ -9,8 +9,11 @@
  *           shortest path.
 */
 
+using System.Windows.Forms.Design;
+
 namespace Mooty_Shortest_Path
 {
+
     public partial class frmMain : Form
     {
 
@@ -34,6 +37,8 @@ namespace Mooty_Shortest_Path
         private void frmMain_Load(object sender, EventArgs e)
         {
             // test graph
+            
+            /*
             graphCanvas.AddVertex(125, 50, "NYC");
             graphCanvas.AddVertex(75, 225, "CHI");
             graphCanvas.AddVertex(305, 195, "ATL");
@@ -47,6 +52,8 @@ namespace Mooty_Shortest_Path
             graphCanvas.AddEdge(0, 3, 8.16);
             graphCanvas.AddEdge(3, 4, 18.30);
             graphCanvas.AddEdge(2, 4, 11.58);
+            */
+            
         }
 
         private void graphCanvas_OnMouseOverEdge(object sender, DirectedEdge e)
@@ -63,17 +70,6 @@ namespace Mooty_Shortest_Path
         private void graphCanvas_OnEdgeMouseClick(object sender, DirectedEdge e)
         {
             lblDebug2.Text = $"Edge {e.From.Label}->{e.To.Label} was clicked";
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if(selectedVertex != null)
-                graphCanvas.RemoveVertex(selectedVertex);
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            graphCanvas.TestLoopEvent();
         }
 
         private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex v)
@@ -118,6 +114,21 @@ namespace Mooty_Shortest_Path
             if (frmAddVertex.Vertex != null)
                 graphCanvas.Invalidate();
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            graphCanvas.SaveGraphToFile("test.txt");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            graphCanvas.LoadGraphFromFile("test.txt");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            graphCanvas.Clear();
         }
     }
 }

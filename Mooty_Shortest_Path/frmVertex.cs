@@ -87,9 +87,10 @@ public partial class frmVertex : Form
     private void btnAddEdge_Click(object sender, EventArgs e)
     { 
 
-        if (parentGraphCanvas.Graph.Vertices.Count == 0)
+        if (parentGraphCanvas.Graph.Vertices.Count ==0)//<= 1)
         {
-            MessageBox.Show("There are no vertices to link to yet.\nAdd more vertices to add edges.");
+            Program.ShowMessage("There are not enough vertices to create an edge yet.\n" +
+                        "Add more vertices and try again.", "Error", this.Location); 
             return;
         }
 
@@ -159,7 +160,7 @@ public partial class frmVertex : Form
     {
         if(txtLabel.Text.Trim() == "")
         {
-            MessageBox.Show("Please enter a valid label.");
+            Program.ShowMessage("Please enter a valid label.", "Error", this.Location);
             txtLabel.Focus();
             return false;
         }
@@ -167,7 +168,7 @@ public partial class frmVertex : Form
         // this should never happen
         if(!int.TryParse(txtX.Text, out int x) || !int.TryParse(txtY.Text, out int y))
         {
-            MessageBox.Show("Please enter valid coordinates");
+            Program.ShowMessage("Please enter valid coordinates", "Error", this.Location);
             return false;
         }
 
@@ -238,18 +239,47 @@ public partial class frmVertex : Form
 
     private void AddEdgeToListView(ListView lv, DirectedEdge e)
     {
-        ListViewItem item = new ListViewItem(e.From.Label.ToString());
-        item.SubItems.Add(e.To.Label.ToString());
-        item.SubItems.Add(e.Weight.ToString());
-        lvwEdges.Items.Add(item);
+        if (DoesEdgeExistInListView(lv, e.From.Label, e.To.Label, out int found_index))
+        {
+            // if the edge already exists in the listview, then update the weight
+            lv.Items[found_index].SubItems[2].Text = e.Weight.ToString();
+        }
+        else
+        {
+            ListViewItem item = new ListViewItem(e.From.Label.ToString());
+            item.SubItems.Add(e.To.Label.ToString());
+            item.SubItems.Add(e.Weight.ToString());
+            lvwEdges.Items.Add(item);
+        }
     }
 
     private void AddEdgeToListView(ListView lv, string from_label, string to_label, double weight)
     {
-        ListViewItem item = new ListViewItem(from_label);
-        item.SubItems.Add(to_label);
-        item.SubItems.Add(weight.ToString());
-        lvwEdges.Items.Add(item);
+        if (DoesEdgeExistInListView(lv, from_label, to_label, out int found_index))
+        {
+            // if the edge already exists in the listview, then update the weight
+            lv.Items[found_index].SubItems[2].Text = weight.ToString();
+        }
+        else
+        {
+            ListViewItem item = new ListViewItem(from_label);
+            item.SubItems.Add(to_label);
+            item.SubItems.Add(weight.ToString());
+            lvwEdges.Items.Add(item);
+        }
+    }
+
+    private bool DoesEdgeExistInListView(ListView lv, string from_label, string to_label, out int at_index)
+    {
+        foreach(ListViewItem item in lv.Items)
+            if (item.SubItems[0].Text  == from_label && item.SubItems[1].Text == to_label)
+            {
+                at_index = item.Index;
+                return true;
+            }
+
+        at_index = -1;
+        return false;
     }
 
     private void btnCancel_Click(object sender, EventArgs e)
@@ -262,6 +292,7 @@ public partial class frmVertex : Form
         if (lvwEdges.SelectedItems.Count > 0)
             lvwEdges.SelectedItems[0].Remove();
     }
+
 }
 
 

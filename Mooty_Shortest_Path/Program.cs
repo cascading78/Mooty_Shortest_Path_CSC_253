@@ -13,5 +13,14 @@ namespace Mooty_Shortest_Path
             ApplicationConfiguration.Initialize();
             Application.Run(new frmMain());
         }
+
+        public static void ShowMessage(string message, string form_caption, Point location)
+        {
+            frmMessage frmMsgDialog = new frmMessage();
+            frmMsgDialog.ShowMessage(message, form_caption, location);
+            frmMsgDialog.ShowDialog();
+        }
+
     }
+
 }

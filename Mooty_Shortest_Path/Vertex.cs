@@ -75,6 +75,14 @@ namespace Mooty_Shortest_Path
                 edge.Weight = weight;
         }
 
+        public bool DoesEdgeExist(string from_label, string to_label)
+        {
+            foreach (DirectedEdge edge in _edges)
+                if (edge.From.Label == from_label && edge.To.Label == to_label)
+                    return true;
+
+            return false;
+        }
         //public void updateEdge()
 
     }

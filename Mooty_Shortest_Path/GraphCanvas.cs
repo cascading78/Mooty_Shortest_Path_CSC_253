@@ -41,12 +41,13 @@ public partial class GraphCanvas : UserControl
     private Color EDGE_WEIGHT_COLOR = Color.FloralWhite;
 
     private Graph _graph = new Graph();
+    public Graph Graph {  get { return _graph; }  }
     private bool hasGraphChanged = false;
     private Bitmap graphImg = null;
     private DirectedVertex? mouseOverVert = null; // reference to vert mouse is currently over, if any
     private DirectedEdge? mouseOverEdge = null; // reference to edge mouse is currently over, if any
     private DirectedVertex? selectedVert = null;
-    private DirectedEdge? selectedEdge = null;
+    //private DirectedEdge? selectedEdge = null;
     private object? prevMouseOver = null; // reference to edge/vert mouse was previously over, if any
     private Point currentMousePoint;
 
@@ -60,8 +61,6 @@ public partial class GraphCanvas : UserControl
     public Color VertexForeColor { get { return _vertexForeColor; } set { _vertexForeColor = value; } }
     private Color _vertexHighlightColor = Color.DeepSkyBlue;
     public Color VertexHighlightColor { get { return _vertexHighlightColor; } set { _vertexHighlightColor = value; } }
-
-    public Graph Graph { get { return _graph; } }
 
     public bool ShowGrid { get; set; }
     public bool LockObjects { get; set; }
@@ -257,6 +256,10 @@ public partial class GraphCanvas : UserControl
         return _graph.GetVertex(label);
     }
 
+
+    // searches vertex paths to determine if the x, y coordinate is within
+    //  a vertex.  returns a reference to DirectedVertex object if found,
+    //  null if not
     public DirectedVertex? GetVertexAt(int x, int y)
     {
         for (int i = 0; i < vert_paths.Count; i++)
@@ -277,11 +280,7 @@ public partial class GraphCanvas : UserControl
             _graph.Vertices[found_index].Y = y;
 
             // update the graphics path object
-            GraphicsPath gpath = new GraphicsPath();
-            Rectangle rectText = GetTextRect(_graph.Vertices[found_index].Label, x, y, this.Font);
-            gpath.AddRectangle(rectText);
-            vert_paths[found_index].Dispose();
-            vert_paths[found_index] = gpath;
+            UpdateVertexPath(_graph.Vertices[found_index], found_index);
 
             foreach(DirectedEdge edge in _graph.Vertices[found_index].Edges)
                 updateEdgePath(edge);
@@ -341,6 +340,26 @@ public partial class GraphCanvas : UserControl
 
     }
 
+
+    private void AddVertexPath(DirectedVertex vertex)
+    {
+        GraphicsPath gpath = new GraphicsPath();
+        Rectangle rectText = GetTextRect(vertex.Label, vertex.X, vertex.Y, this.Font);
+        gpath.AddRectangle(rectText);
+        vert_paths.Add(gpath);
+    }
+
+    private void UpdateVertexPath(DirectedVertex vertex, int found_index)
+    {
+        GraphicsPath gpath = new GraphicsPath();
+        Rectangle rectText = GetTextRect(vertex.Label, vertex.X, vertex.Y, this.Font);
+
+        gpath.AddRectangle(rectText);
+
+        vert_paths[found_index].Dispose();
+        vert_paths[found_index] = gpath;
+    }
+
     public DirectedEdge? GetEdgeAt(int x, int y)
     {
         for (int i = 0; i < edge_paths.Count; i++)
@@ -352,28 +371,18 @@ public partial class GraphCanvas : UserControl
 
     public void AddVertex(int x, int y, string label)
     {
-        _graph.addVertex(x, y, label);
-        
-        GraphicsPath gpath = new GraphicsPath();
-        Rectangle rectText = GetTextRect(label, x, y, this.Font);
-        gpath.AddRectangle(rectText);
-        vert_paths.Add(gpath);
-        hasGraphChanged = true;
+        DirectedVertex new_vertex = new DirectedVertex(x, y, label);
 
-        rebuildEdgeAdjacency();
-        updateEdgePaths();
+        AddVertex(new_vertex);
     }
 
     public void AddVertex(DirectedVertex v)
     {
         _graph.addVertex(v);
 
-        GraphicsPath gpath = new GraphicsPath();
-        Rectangle rectText = GetTextRect(v.Label, v.X, v.Y, this.Font);
-        gpath.AddRectangle(rectText);
-        vert_paths.Add(gpath);
-        hasGraphChanged = true;
+        AddVertexPath(v);
 
+        hasGraphChanged = true;
         rebuildEdgeAdjacency();
         updateEdgePaths();
     }
@@ -458,6 +467,96 @@ public partial class GraphCanvas : UserControl
         hasGraphChanged = true;
 
         this.Invalidate();
+    }
+
+    public void Clear()
+    {
+        _graph = new Graph();
+
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
+        vert_paths.Clear();
+        hasGraphChanged=true;
+        this.Invalidate();
+    }
+
+    public void SaveGraphToFile(string file_path)
+    {
+        using (StreamWriter writer = new StreamWriter(file_path))
+        {
+            foreach (DirectedVertex vertex in _graph.Vertices)
+                writer.WriteLine($"{vertex.Label}:{vertex.X}:{vertex.Y}");
+
+            writer.WriteLine("~~~");
+
+            foreach (DirectedVertex vertex in _graph.Vertices)
+                foreach (DirectedEdge edge in vertex.Edges)
+                    writer.WriteLine($"{edge.From.Label}:{edge.To.Label}:{edge.Weight}");
+        }
+
+    }
+
+    public void LoadGraphFromFile(string file_path)
+    {
+        Graph g = new Graph();
+        vert_paths.Clear();
+
+        using (StreamReader reader = new StreamReader(file_path))
+        {
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine();
+
+                if (line == "~~~") break;
+
+                DirectedVertex new_vertex = ExtractVertexFromLine(line);
+
+                g.addVertex(new_vertex);
+                AddVertexPath(new_vertex);
+            }
+
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine();
+
+                DirectedEdge new_edge = ExtractEdgeFromLine(g, line, out DirectedVertex from_vertex);
+                from_vertex.addEdge(new_edge);
+            }
+
+        }
+
+        _graph = g;
+        rebuildEdgeAdjacency();
+        updateEdgePaths();
+        hasGraphChanged = true;
+        this.Invalidate();
+
+    }
+
+    private DirectedVertex? ExtractVertexFromLine(string line)
+    {
+        string[] fields = line.Split(':');
+
+        if (fields.Length != 3) return null;
+
+        return new DirectedVertex(int.Parse(fields[1]), int.Parse(fields[2]), fields[0]);
+    }
+
+    private DirectedEdge? ExtractEdgeFromLine(Graph g, string line, out DirectedVertex from_vertex)
+    {
+        string[] fields = line.Split(':');
+
+        if (fields.Length != 3)
+        {
+            from_vertex = null;
+            return null;
+        }
+
+        from_vertex = g.GetVertex(fields[0]);
+
+        return new DirectedEdge(from_vertex,
+                                g.GetVertex(fields[1]),
+                                double.Parse(fields[2]));
     }
 
     private void GraphCanvas_MouseDown(object sender, MouseEventArgs e)

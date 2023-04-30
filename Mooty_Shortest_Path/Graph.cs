@@ -79,9 +79,8 @@ namespace Mooty_Shortest_Path
         public bool DoesEdgeExist(string from_label, string to_label)
         {
             foreach (DirectedVertex vertex in _vertices)
-                foreach (DirectedEdge edge in vertex.Edges)
-                    if (edge.From.Label == from_label && edge.To.Label == to_label)
-                        return true;
+                if (vertex.DoesEdgeExist(from_label, to_label))
+                    return true;
 
             return false;
         }
