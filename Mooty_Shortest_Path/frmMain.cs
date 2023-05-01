@@ -79,7 +79,7 @@ namespace Mooty_Shortest_Path
             frmVertex frmVertex = new frmVertex();
             frmVertex.InitializeEditState(graphCanvas, v);
             frmVertex.Location = new Point(v.X, v.Y);
-            frmVertex.Show();
+            frmVertex.ShowDialog();
         }
 
         private void graphCanvas_OnEdgeDoubleClick(object sender, DirectedEdge e)
@@ -99,7 +99,7 @@ namespace Mooty_Shortest_Path
 
         private void graphCanvas_Load(object sender, EventArgs e)
         {
-
+            graphCanvas.ShowGrid = true;
         }
 
         private void graphCanvas_OnGridDoubleClick(object sender, Point pt)
@@ -129,6 +129,12 @@ namespace Mooty_Shortest_Path
         private void button3_Click(object sender, EventArgs e)
         {
             graphCanvas.Clear();
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            //graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[9], graphCanvas.Graph.Vertices[10]);
+            graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[0], graphCanvas.Graph.Vertices[4]);
         }
     }
 }

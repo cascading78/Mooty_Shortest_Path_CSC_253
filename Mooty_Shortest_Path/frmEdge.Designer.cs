@@ -64,7 +64,7 @@
             this.cboTo.Location = new System.Drawing.Point(127, 49);
             this.cboTo.Name = "cboTo";
             this.cboTo.Size = new System.Drawing.Size(117, 28);
-            this.cboTo.TabIndex = 3;
+            this.cboTo.TabIndex = 2;
             // 
             // label2
             // 
@@ -90,14 +90,14 @@
             this.txtWeight.Location = new System.Drawing.Point(171, 86);
             this.txtWeight.Name = "txtWeight";
             this.txtWeight.Size = new System.Drawing.Size(73, 27);
-            this.txtWeight.TabIndex = 5;
+            this.txtWeight.TabIndex = 3;
             // 
             // btnCancel
             // 
             this.btnCancel.Location = new System.Drawing.Point(171, 129);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(70, 29);
-            this.btnCancel.TabIndex = 12;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -107,7 +107,7 @@
             this.btnApply.Location = new System.Drawing.Point(19, 129);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(70, 29);
-            this.btnApply.TabIndex = 11;
+            this.btnApply.TabIndex = 4;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
@@ -117,7 +117,7 @@
             this.btnDelete.Location = new System.Drawing.Point(95, 129);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(70, 29);
-            this.btnDelete.TabIndex = 13;
+            this.btnDelete.TabIndex = 5;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);

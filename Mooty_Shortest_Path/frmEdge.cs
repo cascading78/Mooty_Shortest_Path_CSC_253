@@ -28,6 +28,7 @@ public partial class frmEdge : Form
     {
         parentGraphCanvas = graphCanvas;
         parentVertex = vertFrom;
+        this.Text = $"Add Edge from {vertFrom.Label}";
         LoadComboBox(cboTo, vertFrom);
         cboFrom.Items.Add(vertFrom.Label);
         cboFrom.SelectedItem = cboFrom.Items[cboFrom.Items.IndexOf(vertFrom.Label)];
@@ -46,6 +47,7 @@ public partial class frmEdge : Form
     public void InitializeEditEdgeFromVertexState(GraphCanvas graphCanvas, string from_label, string to_label, double weight)
     {
         parentGraphCanvas = graphCanvas;
+        this.Text = "Edit Edge";
         cboFrom.Items.Add(from_label);
         cboTo.Items.Add(to_label);
         cboFrom.SelectedIndex = 0;

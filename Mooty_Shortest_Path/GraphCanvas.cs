@@ -70,15 +70,31 @@ public partial class GraphCanvas : UserControl
         InitializeComponent();
     }
 
-    public void TestLoopEvent()
+    private void GraphCanvas_Load(object sender, EventArgs e)
     {
-        _graph.LoopThroughVerts();
+        this.DoubleBuffered = true;
+        //this.graphCanvas.OnGridDoubleClick += new System.EventHandler<System.Drawing.Point>(this.graphCanvas_OnGridDoubleClick);
+        _graph.SearchingVertex +=this.GC_SearchingVertex;
+        _graph.SearchingEdge += this.GC_SearchingEdge;
+        //ShowGrid = true;
     }
 
     // test event
     private void SearchingVertex(object sender, DirectedVertex v)
     {
-        MessageBox.Show($"VERT:{v.Label}");
+        label1.Text = $"Searching: {v.Label}";
+    }
+
+    void GC_SearchingVertex(object sender, DirectedVertex v)
+    {
+        label1.Text = $"Searching: {v.Label}";
+        Application.DoEvents();
+        System.Threading.Thread.Sleep(500);
+    }
+
+    void GC_SearchingEdge(object sender, DirectedEdge e)
+    {
+        label1.Text = $"Searching: {e.From.Label}->{e.To.Label}";
     }
 
     private void GraphCanvas_Paint(object sender, PaintEventArgs e)
@@ -92,6 +108,8 @@ public partial class GraphCanvas : UserControl
             e.Graphics.DrawImage(graphImg, 0, 0);
             hasGraphChanged = false;
         }
+        else if(ShowGrid)
+            DrawGrid(e.Graphics);
     }
 
     private Rectangle GetTextRect(string s, int x, int y, Font font)
@@ -198,13 +216,6 @@ public partial class GraphCanvas : UserControl
 
         for (int y = 0; y < this.Width; y += GRID_SIZE)
             g.DrawLine(pen, 0, y, this.Width, y);
-    }
-
-    private void GraphCanvas_Load(object sender, EventArgs e)
-    {
-        this.DoubleBuffered = true;
-        _graph.SearchingVertex += SearchingVertex;
-        //ShowGrid = true;
     }
 
     private void GraphCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -473,6 +484,9 @@ public partial class GraphCanvas : UserControl
     {
         _graph = new Graph();
 
+        _graph.SearchingVertex += GC_SearchingVertex;
+        _graph.SearchingEdge += GC_SearchingEdge;
+
         rebuildEdgeAdjacency();
         updateEdgePaths();
         vert_paths.Clear();
@@ -499,6 +513,10 @@ public partial class GraphCanvas : UserControl
     public void LoadGraphFromFile(string file_path)
     {
         Graph g = new Graph();
+
+        g.SearchingVertex += GC_SearchingVertex;
+        g.SearchingEdge += GC_SearchingEdge;
+
         vert_paths.Clear();
 
         using (StreamReader reader = new StreamReader(file_path))

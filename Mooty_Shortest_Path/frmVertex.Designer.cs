@@ -114,7 +114,7 @@
             this.lvwEdges.MultiSelect = false;
             this.lvwEdges.Name = "lvwEdges";
             this.lvwEdges.Size = new System.Drawing.Size(151, 129);
-            this.lvwEdges.TabIndex = 6;
+            this.lvwEdges.TabIndex = 7;
             this.lvwEdges.UseCompatibleStateImageBehavior = false;
             this.lvwEdges.View = System.Windows.Forms.View.Details;
             this.lvwEdges.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lvwEdges_MouseDoubleClick);
@@ -158,7 +158,7 @@
             this.btnApply.Location = new System.Drawing.Point(25, 244);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(70, 32);
-            this.btnApply.TabIndex = 7;
+            this.btnApply.TabIndex = 8;
             this.btnApply.Text = "Apply";
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
@@ -168,7 +168,7 @@
             this.btnCancel.Location = new System.Drawing.Point(177, 244);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(70, 32);
-            this.btnCancel.TabIndex = 9;
+            this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -189,7 +189,7 @@
             this.btnDelete.Location = new System.Drawing.Point(101, 244);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(70, 32);
-            this.btnDelete.TabIndex = 8;
+            this.btnDelete.TabIndex = 9;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
@@ -200,7 +200,7 @@
             this.btnRemoveEdge.Location = new System.Drawing.Point(21, 190);
             this.btnRemoveEdge.Name = "btnRemoveEdge";
             this.btnRemoveEdge.Size = new System.Drawing.Size(44, 28);
-            this.btnRemoveEdge.TabIndex = 10;
+            this.btnRemoveEdge.TabIndex = 6;
             this.btnRemoveEdge.Text = "Rem";
             this.btnRemoveEdge.UseVisualStyleBackColor = true;
             this.btnRemoveEdge.Click += new System.EventHandler(this.btnRemoveEdge_Click);
@@ -225,6 +225,9 @@
             this.Controls.Add(this.txtLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "frmVertex";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Vertex";

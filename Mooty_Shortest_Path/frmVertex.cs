@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Text;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Mooty_Shortest_Path;
+﻿namespace Mooty_Shortest_Path;
 
 public partial class frmVertex : Form
 {
@@ -31,6 +20,7 @@ public partial class frmVertex : Form
         parentGraphCanvas = graphCanvas;
         btnApply.Text = "Add";
         btnDelete.Visible = false;
+        this.Text = "Add Vertex";
         txtX.Text = x.ToString();
         txtY.Text = y.ToString();
     }
@@ -43,6 +33,7 @@ public partial class frmVertex : Form
         parentGraphCanvas = graphCanvas;
         btnApply.Text = "Update";
         btnDelete.Visible = true;
+        this.Text = "Update Vertex";
         LoadVertex(v);
     }
 
