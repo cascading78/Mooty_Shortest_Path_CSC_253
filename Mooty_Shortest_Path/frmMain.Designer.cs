@@ -35,6 +35,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // graphCanvas
@@ -43,7 +44,7 @@
             this.graphCanvas.EdgeColor = System.Drawing.Color.Black;
             this.graphCanvas.EdgeHighlightColor = System.Drawing.Color.Chartreuse;
             this.graphCanvas.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.graphCanvas.Location = new System.Drawing.Point(57, 25);
+            this.graphCanvas.Location = new System.Drawing.Point(83, 25);
             this.graphCanvas.LockObjects = false;
             this.graphCanvas.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.graphCanvas.Name = "graphCanvas";
@@ -120,11 +121,21 @@
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 20;
+            this.listBox1.Location = new System.Drawing.Point(1, 89);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(75, 144);
+            this.listBox1.TabIndex = 7;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1441, 713);
+            this.ClientSize = new System.Drawing.Size(1499, 713);
+            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -150,5 +161,6 @@
         private Button button2;
         private Button button3;
         private Button btnTest;
+        private ListBox listBox1;
     }
 }

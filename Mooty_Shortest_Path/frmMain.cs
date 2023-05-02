@@ -132,9 +132,15 @@ namespace Mooty_Shortest_Path
         }
 
         private void btnTest_Click(object sender, EventArgs e)
-        {
+        { 
+
+            listBox1.Items.Clear();
+
             //graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[9], graphCanvas.Graph.Vertices[10]);
-            graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[0], graphCanvas.Graph.Vertices[4]);
+            List<DirectedVertex> path = graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[0], graphCanvas.Graph.Vertices[4]);
+
+            foreach (DirectedVertex v in path)
+                listBox1.Items.Add(v.Label);
         }
     }
 }
