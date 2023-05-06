@@ -28,38 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 258);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(50, 20);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
             // 
             // GraphCanvas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.label1);
             this.Name = "GraphCanvas";
             this.Size = new System.Drawing.Size(451, 297);
             this.Load += new System.EventHandler(this.GraphCanvas_Load);
+            this.SizeChanged += new System.EventHandler(this.GraphCanvas_SizeChanged);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.GraphCanvas_Paint);
             this.DoubleClick += new System.EventHandler(this.GraphCanvas_DoubleClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GraphCanvas_MouseDown);
+            this.MouseEnter += new System.EventHandler(this.GraphCanvas_MouseEnter);
+            this.MouseLeave += new System.EventHandler(this.GraphCanvas_MouseLeave);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GraphCanvas_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GraphCanvas_MouseUp);
+            this.Resize += new System.EventHandler(this.GraphCanvas_Resize);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private Label label1;
     }
 }

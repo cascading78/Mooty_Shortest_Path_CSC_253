@@ -3,16 +3,13 @@
 namespace Mooty_Shortest_Path
 {
 
-    public class Vertex
+    public class DirectedVertex
     {
         public int X;
         public int Y;
         public string Label { get; set; }
-    }
 
-    public class DirectedVertex : Vertex
-    {
-        List<DirectedEdge> _edges = new List<DirectedEdge> ();
+        List<DirectedEdge> _edges = new List<DirectedEdge>();
         public IList<DirectedEdge> Edges { get { return _edges; } }
 
         public DirectedVertex(int x, int y, string label)
@@ -30,6 +27,7 @@ namespace Mooty_Shortest_Path
         public void addEdge(DirectedEdge edge)
         {
             _edges.Add(edge);
+            // edge.To.addEdge(edge.From, edge.Weight); // makes graph undirected
         }
 
         public void removeEdge(DirectedEdge edge)
@@ -71,7 +69,7 @@ namespace Mooty_Shortest_Path
         {
             DirectedEdge edge = GetEdge(from_label, to_label);
 
-            if(edge != null)
+            if (edge != null)
                 edge.Weight = weight;
         }
 
@@ -83,20 +81,14 @@ namespace Mooty_Shortest_Path
 
             return false;
         }
-        //public void updateEdge()
 
     }
-    
-    public class Edge
-    { 
-        
-    }
 
-    public class DirectedEdge : Edge
+    public class DirectedEdge
     {
         public DirectedVertex To { get; }
         public DirectedVertex From { get; }
-        public double Weight { get; set;  }
+        public double Weight { get; set; }
 
 
         public DirectedEdge(DirectedVertex from, DirectedVertex to, double weight)

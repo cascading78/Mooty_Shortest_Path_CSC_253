@@ -3,7 +3,7 @@
 public partial class frmEdge : Form
 {
 
-    private GraphCanvas parentGraphCanvas; // = null;
+    private GraphCanvas? parentGraphCanvas;
     private DirectedVertex? parentVertex = null;
     private DirectedEdge? originalEdge = null;
 
@@ -59,23 +59,6 @@ public partial class frmEdge : Form
         btnDelete.Enabled = true;
 
     }
-
-    // deFUNCt
-    /*public void InitializeState(GraphCanvas graphCanvas, bool addToVertMode = false, DirectedVertex vertFrom = null)
-    {
-
-        parentGraphCanvas = graphCanvas;
-
-        LoadComboBoxes();
-
-        if(addToVertMode && vertFrom != null)
-        {
-            cboFrom.Items.Add(vertFrom.Label);
-            cboFrom.SelectedItem = cboFrom.Items[cboFrom.Items.IndexOf(vertFrom.Label)];
-            cboFrom.Enabled = false;
-        }
-
-    }*/
 
     private void LoadEdge(DirectedEdge edge)
     {
@@ -144,7 +127,7 @@ public partial class frmEdge : Form
     private void LoadComboBox(ComboBox cbo, DirectedVertex? except_this_vertex = null)
     {
         //load combo boxes
-        foreach (Vertex v in parentGraphCanvas.Graph.Vertices)
+        foreach (DirectedVertex v in parentGraphCanvas.Graph.Vertices)
             if(!v.Equals(except_this_vertex))
                 cbo.Items.Add(v.Label);
     }
@@ -165,11 +148,12 @@ public partial class frmEdge : Form
             return false;
         }
 
-        /*if((btnApply.Text == "Add" && (parentGraphCanvas.Graph.DoesEdgeExist(cboFrom.Text, cboTo.Text))))
+        // if reverse of the proposed edge already exists
+        if ((btnApply.Text == "Add" && (parentGraphCanvas.Graph.DoesEdgeExist(cboTo.Text, cboFrom.Text))))
         {
-            MessageBox.Show("That edge already exists.");
+            Program.ShowMessage("That edge already exists in the reverse direction.", "Error", this.Location);
             return false;
-        }*/
+        }
 
         return true;
     }

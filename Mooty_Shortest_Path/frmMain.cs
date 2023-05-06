@@ -8,139 +8,235 @@
  *           display. You can use the Bellman or the Dijkstra algorithm to compute the 
  *           shortest path.
 */
+namespace Mooty_Shortest_Path;
 
-using System.Windows.Forms.Design;
-
-namespace Mooty_Shortest_Path
+public partial class frmMain : Form
 {
 
-    public partial class frmMain : Form
+    public frmMain()
+    {
+        InitializeComponent();
+    }
+
+    private void frmMain_Load(object sender, EventArgs e)
+    {
+        ResizeControls();
+        chkShowGrid.Checked = graphCanvas.ShowGrid;
+        chkWeights.Checked = graphCanvas.ShowWeights;
+        txtDelay.Text = graphCanvas.SearchDelay.ToString();
+    }
+
+    private void graphCanvas1_MouseMove(object sender, MouseEventArgs e)
+    {
+        lblCoords.Text = $"x={e.X} y={e.Y}";
+    }
+
+    private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex v)
+    {
+        // open form to edit vertex when user double-clicks a vertex
+        frmVertex frmVertex = new frmVertex();
+        frmVertex.InitializeEditState(graphCanvas, v);
+        frmVertex.Location = new Point(v.X, v.Y);
+        frmVertex.ShowDialog();
+    }
+
+    private void graphCanvas_OnEdgeDoubleClick(object sender, DirectedEdge e)
     {
 
-        DirectedVertex selectedVertex = null;
+        // open edge form in edit mode to edit/delete edge when a user double clicks 
+        frmEdge frmEdgeEdit = new frmEdge();
+        frmEdgeEdit.InitializeEditEdgeState(graphCanvas, e);
+        frmEdgeEdit.Location = new Point((e.From.X + e.To.X) / 2, (e.From.Y + e.To.Y) / 2);
+        frmEdgeEdit.ShowDialog();
 
-        public frmMain()
+        if (frmEdgeEdit.DeletePressed)
+            graphCanvas.RemoveEdge(e);
+        else if (frmEdgeEdit.ApplyPressed)
+            graphCanvas.UpdateEdge(e, frmEdgeEdit.DirectedEdge.Weight);
+
+    }
+
+    private void graphCanvas_OnGridDoubleClick(object sender, Point pt)
+    { 
+        // if user double-clicks in the empty grid, then open the add
+        //  vertex form in add new state
+        frmVertex frmAddVertex = new frmVertex();
+        frmAddVertex.Location = pt;
+        frmAddVertex.InitializeAddNewState(graphCanvas, pt.X, pt.Y);
+        frmAddVertex.ShowDialog();
+
+        if (frmAddVertex.Vertex != null)
+            graphCanvas.Invalidate();
+
+    }
+
+    private void graphCanvas_OnMouseEnterVertex(object sender, DirectedVertex e)
+    {
+        lblStatus.Text = "Click and drag to move. Double-click to edit or delete.";
+    }
+
+    private void graphCanvas_OnMouseEnterEdge(object sender, DirectedEdge e)
+    {
+        lblStatus.Text = "Double-click to edit or delete the Edge.";
+    }
+
+    private void graphCanvas_OnMouseEnterGrid(object sender, MouseEventArgs e)
+    {
+        lblStatus.Text = "Double-click in the grid to add a new Vertex.";
+    }
+
+    private void btnOpen_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog ofd = new OpenFileDialog();
+
+        // open file dialog, filter out all files except ones that end in .gph
+        ofd.InitialDirectory = Application.StartupPath;
+        ofd.Filter = "Graph files (*.gph)|*.gph|All files (*.*)|*.*";
+        ofd.FileName = "";
+
+        if (ofd.ShowDialog() == DialogResult.OK)
         {
-            InitializeComponent();
+            try
+            {
+                graphCanvas.LoadGraphFromFile(ofd.FileName);
+            }
+            catch (Exception ex)
+            {
+                Program.ShowMessage("Your file could not be loaded.\nTry again with a different file.", "File Error", this.Location);
+            }
         }
+    }
 
-        private void graphCanvas1_MouseMove(object sender, MouseEventArgs e)
+    private void btnSave_Click(object sender, EventArgs e)
+    {
+
+        if (graphCanvas.VertexCount == 0) return;
+
+        SaveFileDialog sfd = new SaveFileDialog();
+
+        sfd.InitialDirectory = Application.StartupPath;
+        sfd.Filter = "Graph files (*.gph)|*.gph|All files (*.*)|*.*";
+        sfd.FileName = "";
+
+        if (sfd.ShowDialog() == DialogResult.OK)
         {
-            lblDebug.Text = $"x={e.X} y={e.Y}";
+            graphCanvas.SaveGraphToFile(sfd.FileName);
         }
+    }
 
-        private void graphCanvas1_OnMouseOverVertex(object sender, DirectedVertex e)
+    private void frmMain_Resize(object sender, EventArgs e)
+    {
+        ResizeControls();
+    }
+
+    private void ResizeControls()
+    {
+        graphCanvas.Width = this.ClientRectangle.Width - 125;
+        graphCanvas.Height = this.ClientRectangle.Height - 85;
+        lblCoords.Location = new Point((int)(graphCanvas.Width * 0.97), graphCanvas.Height + graphCanvas.Location.Y + 1);
+        lblCoords.Width  = (int)(graphCanvas.Width * 0.03) + graphCanvas.Location.X;
+        lblStatus.Location = new Point(graphCanvas.Location.X, graphCanvas.Height + graphCanvas.Location.Y + 1);
+        lblStatus.Width = (int)(graphCanvas.Width * 0.5);
+    }
+
+    private void DisableEnableButtons(bool enable = true)
+    {
+        foreach(Control control in this.Controls)
+            if(control.GetType() == typeof(Button))
+                control.Enabled = enable;
+
+        btnCancelSearch.Enabled = !enable;
+        btnCancelSearch.Visible = !enable;
+    }
+
+    private void btnShortestPath_Click(object sender, EventArgs e)
+    {
+
+        if (graphCanvas.VertexCount == 0) return; // exit if graph is empty
+
+        // load new path form to determine the start/dest vertices and algorithm to use to 
+        //  find the shortest path
+        List<DirectedVertex> path = new List<DirectedVertex>();
+        frmPath frmNewPath = new frmPath();
+        frmNewPath.InitializeShortestPath(graphCanvas);
+        frmNewPath.ShowDialog();
+
+        // disable all the buttons on the form while the search is ongoing
+        DisableEnableButtons(false);
+
+        if(frmNewPath.StartingVertex != null && frmNewPath.EndingVertex != null)
         {
-            //lblDebug2.Text = $"Mouse over Vert: {e.Label}";
+            double total_cost = 0;
+
+            lblStatus.Text = $"Searching for shortest path from Vertex {frmNewPath.StartingVertex.Label} to Vertex {frmNewPath.EndingVertex.Label}" +
+                             $" using the {GetAlgoName(frmNewPath.Algorithm)} algorithm.";
+
+            // get path, if one can be found
+            path = graphCanvas.GetShortestPath(frmNewPath.Algorithm, frmNewPath.StartingVertex, frmNewPath.EndingVertex, out total_cost);
+
+            if (path.Count == 0)
+                lblStatus.Text = "No Path found";
+            else
+                lblStatus.Text = $"Path found, total cost {total_cost:F2}.  See highlighted path on graph. Click anywhere to continue editing Graph.";
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
-        {
-            // test graph
-            
-            /*
-            graphCanvas.AddVertex(125, 50, "NYC");
-            graphCanvas.AddVertex(75, 225, "CHI");
-            graphCanvas.AddVertex(305, 195, "ATL");
-            graphCanvas.AddVertex(298, 419, "SEA");
-            graphCanvas.AddVertex(450, 169, "MIA");
-            graphCanvas.AddEdge(0, 1, 12.98);
-            graphCanvas.AddEdge(1, 2, 10.66);
-            graphCanvas.AddEdge(0, 2, 6.39);
-            graphCanvas.AddEdge(1, 3, 4.91);
-            graphCanvas.AddEdge(2, 3, 13.07);
-            graphCanvas.AddEdge(0, 3, 8.16);
-            graphCanvas.AddEdge(3, 4, 18.30);
-            graphCanvas.AddEdge(2, 4, 11.58);
-            */
-            
-        }
+        // re-enable buttons
+        DisableEnableButtons(true);
+    }
 
-        private void graphCanvas_OnMouseOverEdge(object sender, DirectedEdge e)
-        {
-            //lblDebug2.Text = $"Mouse over Edge:{e.From.Label}->{e.To.Label} wgt: {e.Weight}";
-        }
+    private string GetAlgoName(ALGORITHM_CHOICE algo)
+    {
+        if (algo == ALGORITHM_CHOICE.DIJKSTRAS)
+            return "Original Dijkstra's";
+        else if (algo == ALGORITHM_CHOICE.DIJKSTRAS_PRIORTY_QUEUE)
+            return "Dijkstra's with Min Priorty Queue";
+        else
+            return "Bellman-Ford";
+    }
 
-        private void graphCanvas_OnVertexMouseClick(object sender, DirectedVertex e)
-        {
-            lblDebug2.Text = $"{e.Label} was clicked.";
-            selectedVertex = e;
-        }
+    private void btnClear_Click(object sender, EventArgs e)
+    {
+        graphCanvas.Clear();
+    }
 
-        private void graphCanvas_OnEdgeMouseClick(object sender, DirectedEdge e)
-        {
-            lblDebug2.Text = $"Edge {e.From.Label}->{e.To.Label} was clicked";
-        }
+    private void chkShowGrid_CheckedChanged(object sender, EventArgs e)
+    {
+        graphCanvas.ShowGrid = chkShowGrid.Checked;
+    }
 
-        private void graphCanvas_OnVertexDoubleClick(object sender, DirectedVertex v)
-        {
-            selectedVertex = v;
+    private void btnReverseEdges_Click(object sender, EventArgs e)
+    {
+        graphCanvas.ReverseEdges();
+    }
+    private void chkWeights_CheckedChanged(object sender, EventArgs e)
+    {
+        graphCanvas.ShowWeights = chkWeights.Checked;
+    }
 
-            frmVertex frmVertex = new frmVertex();
-            frmVertex.InitializeEditState(graphCanvas, v);
-            frmVertex.Location = new Point(v.X, v.Y);
-            frmVertex.ShowDialog();
-        }
+    private void txtDelay_Leave(object sender, EventArgs e)
+    {
+        UpdateDelay();
+    }
 
-        private void graphCanvas_OnEdgeDoubleClick(object sender, DirectedEdge e)
-        {
+    private void txtDelay_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter)
+            UpdateDelay();
+    }
 
-            frmEdge frmEdgeEdit = new frmEdge();
-            frmEdgeEdit.InitializeEditEdgeState(graphCanvas, e);
-            frmEdgeEdit.Location = new Point((e.From.X + e.To.X) / 2, (e.From.Y + e.To.Y) / 2);
-            frmEdgeEdit.ShowDialog();
+    private void UpdateDelay()
+    {
+        if (int.TryParse(txtDelay.Text, out int new_delay))
+            if(new_delay > 1000)
+                    graphCanvas.SearchDelay = 1000; // cap delay at 1 second
+            else
+                graphCanvas.SearchDelay = new_delay;
 
-            if (frmEdgeEdit.DeletePressed)
-                graphCanvas.RemoveEdge(e);
-            else if (frmEdgeEdit.ApplyPressed)
-                graphCanvas.UpdateEdge(e, frmEdgeEdit.DirectedEdge.Weight);
- 
-        }
+        txtDelay.Text = graphCanvas.SearchDelay.ToString();
+    }
 
-        private void graphCanvas_Load(object sender, EventArgs e)
-        {
-            graphCanvas.ShowGrid = true;
-        }
-
-        private void graphCanvas_OnGridDoubleClick(object sender, Point pt)
-        {
-            DirectedVertex new_vertex = new DirectedVertex(pt.X, pt.Y, "");
-
-            frmVertex frmAddVertex = new frmVertex();
-            frmAddVertex.Location = pt;
-            frmAddVertex.InitializeAddNewState(graphCanvas, pt.X, pt.Y);
-            frmAddVertex.ShowDialog();
-
-            if (frmAddVertex.Vertex != null)
-                graphCanvas.Invalidate();
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            graphCanvas.SaveGraphToFile("test.txt");
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            graphCanvas.LoadGraphFromFile("test.txt");
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            graphCanvas.Clear();
-        }
-
-        private void btnTest_Click(object sender, EventArgs e)
-        { 
-
-            listBox1.Items.Clear();
-
-            //graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[9], graphCanvas.Graph.Vertices[10]);
-            List<DirectedVertex> path = graphCanvas.Graph.ShortestPathDjikstrasWithPriortyQueue(graphCanvas.Graph.Vertices[0], graphCanvas.Graph.Vertices[4]);
-
-            foreach (DirectedVertex v in path)
-                listBox1.Items.Add(v.Label);
-        }
+    private void btnCancelSearch_Click(object sender, EventArgs e)
+    {
+        graphCanvas.CancelSearch();
     }
 }

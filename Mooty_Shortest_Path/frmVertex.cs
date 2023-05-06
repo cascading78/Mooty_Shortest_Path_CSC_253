@@ -4,7 +4,7 @@ public partial class frmVertex : Form
 {
 
     private DirectedVertex? originalVertex = null;
-    private GraphCanvas parentGraphCanvas = null;
+    private GraphCanvas? parentGraphCanvas;
 
     private DirectedVertex? _vertex = null;
     public DirectedVertex? Vertex { get { return _vertex; } }
@@ -78,7 +78,7 @@ public partial class frmVertex : Form
     private void btnAddEdge_Click(object sender, EventArgs e)
     { 
 
-        if (parentGraphCanvas.Graph.Vertices.Count ==0)//<= 1)
+        if (parentGraphCanvas.Graph.Vertices.Count <= 1)
         {
             Program.ShowMessage("There are not enough vertices to create an edge yet.\n" +
                         "Add more vertices and try again.", "Error", this.Location); 
@@ -163,6 +163,13 @@ public partial class frmVertex : Form
             return false;
         }
 
+        if (btnApply.Text == "Add" && parentGraphCanvas.Graph.DoesVertexExist(txtLabel.Text))
+        {
+            Program.ShowMessage($"A vertex named {txtLabel.Text} already exists.\nEnter a unique label name and try again.", "Duplicate Vertex", this.Location);
+            txtLabel.Focus();
+            return false;
+        }
+
         return true;
     }
 
@@ -179,7 +186,6 @@ public partial class frmVertex : Form
         //  the form frmEdge and is not necessary here
         foreach(ListViewItem item in lvwEdges.Items)
         {
-            MessageBox.Show(item.SubItems[1].Text);
 
             DirectedEdge new_edge = new DirectedEdge(
                 new_vertex,
